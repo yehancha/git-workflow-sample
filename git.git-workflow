@@ -1,0 +1,96 @@
+Main Branches
+========
+
+This workflow uses 3 main branches:
+
+    * next
+    * master
+    * maint
+
+Each branch is a decendent of the later branch. Merging maint to master or master to next is called Upword Graduation. It can be done with a simple fast forward merge. Downword Graduation cannot be done fast forward and is not reccamended.
+
+master holds the current stable code.
+
+maint holds the maintanance commits which are done on last stable release.
+
+next is used as a playground for new features before merging into master.
+
+Topic Branches
+==============
+
+Each chunk of work---fixes, features---is done on a topic branch---fix/my-fix, feature/my-feature.
+
+Tags
+====
+
+Tags are used to mark a release. Ex: v1, v2.1, v3-dev
+
+Naming
+======
+
+Use lowercase letters for any naming in git. '-' must be used to seperate words.
+
+For branch naming, use:
+
+    * feature/my-feature for new features
+    * fix/my-fix for fixes
+
+Branching off for new work
+==========================
+
+Always try to branch from the latest common ancester commit of the branches which your fixes are needed. Consider following scenarios.
+
+                ----5---9   feature/2
+               /
+              /   --7       feature/1
+             /   /
+    1---2---3---4---6       master
+         \
+          --8               maint
+
+Scenario 1: You need to start work on a new feature. Work on any other branch will not be affected from your work. Then checkout your branch from master.
+
+Scenario 2: While you are working on feature/1, you find a little bug which needs to be fixed to continue feature/1. You notice that feature/2 will also need this fix. Then branch off from commit #3.
+
+Scenario 3: A hotfix is needed. This should robably go on maint. But it is better that if this fix is available for the current developments (feature/1, feature/2, master). Then branch off from commit #2.
+
+When in doubt, discuss with your coleagues before branching off.
+
+Merging your work
+=================
+
+You know which branches need your work before you branching off (read section "Branching off for new work"). So merging your work would not be a great deal. But, do not merge work if it is really necessary even if you can cleanly merge it.
+
+For an example, in Scenario 3 of Branching off for new work section, if the hotfix you did is only important for feature/2, if it is not important for master or feature/1, merge only to maint and feature/2. master will eventually get the fix from feature/2 or maint.
+
+When in doubt, discuss with your coleagues.
+
+Always use --no-ff (no fast forward) flag when merging to next, master, maint (git merge --no-ff feature/1). This allows you to revert your work easily if it seems bad. Use --no-ff in merges to other branches only if you think you will need to revert your work. This helps to maintain a clean history.
+
+Pull request only if you do not have write permission on the branch. Otherwise just merge and push.
+
+Usage of next branch
+====================
+
+If you think your work needs to be play around with other work before merging to master, merge it to next.
+
+If your work breaks next or playing really bad on next, revert your merge (git revert merge-commit-id) and continue work on your topic branch till it is ready to merge again.
+
+If your work does not play that bad but you think that more refinement is needed, keep the merge as it is and continure work on your topic branch till you it feels it is ready.
+
+If you think that your work is good enough to save the play around time on next, skip next and merge it to master.
+
+Releasing
+=========
+
+We use major.minor.bug-fix versioning.
+
+All releases on maint will only increase bug-fix number.
+
+Before releasing major or minor version, merge maint to master (use --no-ff).
+
+Use tags to mark a release (v1, v1.2, v1.2.4, v2-dev).
+
+If you need to maintain the new and old versions separately, create a new maint branch for the new version and rename the old maint branch appopriately. Otherwise fast forward merge maint to master so it can track maintainance of the new version.
+
+After feature release, clean next by getting it to master (git reset --hard master) and merging all unreleased feature branches. This will make a clean next branch without any junk commits (ex: reset commits).
